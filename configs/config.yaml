@@ -1,0 +1,57 @@
+data:
+  raw_path: data/raw/censo_municipal.csv
+  id_column: Territorialidades
+  target_source_column: "% de extremamente pobres no Cadastro Único pós Bolsa Família 2017"
+  target_column: vulnerabilidade_alta
+
+split:
+  test_size: 0.20
+  random_state: 42
+
+models:
+  selected_model: all
+
+cross_validation:
+  cv_folds: 5
+  scoring: f1
+  n_jobs: -1
+
+search:
+  run_grid_search: true
+
+perceptron:
+  max_iter: 1000
+  tol: 0.001
+  random_state: 42
+
+decision_tree:
+  criterion: gini
+  max_depth: null
+  min_samples_split: 2
+  min_samples_leaf: 1
+  ccp_alpha: 0.0
+  random_state: 42
+
+random_forest:
+  n_estimators: 200
+  max_depth: 10
+  min_samples_split: 10
+  min_samples_leaf: 2
+  max_features: sqrt
+  random_state: 42
+  n_jobs: -1
+
+grid_search:
+  decision_tree:
+    criterion: [gini, entropy]
+    max_depth: [3, 5, 10, null]
+    min_samples_split: [2, 5, 10]
+    min_samples_leaf: [1, 2, 4]
+    ccp_alpha: [0.0, 0.001, 0.01]
+
+  random_forest:
+    n_estimators: [100, 200]
+    max_depth: [5, 10, null]
+    min_samples_split: [2, 5, 10]
+    min_samples_leaf: [1, 2, 4]
+    max_features: [sqrt, log2]
