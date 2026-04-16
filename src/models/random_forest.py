@@ -10,12 +10,20 @@ def build_random_forest_pipeline(
     min_samples_leaf: int = 2,
     max_features: str = "sqrt",
     random_state: int = 42,
-    n_jobs: int = -1
+    n_jobs: int = -1,
+    reduction=None
 ) -> Pipeline:
 
-    model = Pipeline([
-        ("imputer", SimpleImputer(strategy="median")),
-        ("rf", RandomForestClassifier(
+    steps = [
+        ("imputer", SimpleImputer(strategy="median"))
+    ]
+
+    if reduction is not None:
+        steps.append(("reduction", reduction))
+
+    steps.append((
+        "rf",
+        RandomForestClassifier(
             n_estimators=n_estimators,
             max_depth=max_depth,
             min_samples_split=min_samples_split,
@@ -23,6 +31,7 @@ def build_random_forest_pipeline(
             max_features=max_features,
             random_state=random_state,
             n_jobs=n_jobs
-        ))
-    ])
-    return model
+        )
+    ))
+
+    return Pipeline(steps)
