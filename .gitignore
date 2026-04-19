@@ -1,5 +1,6 @@
 # Python
 __pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 *.pyd
@@ -16,11 +17,21 @@ venv/
 mlruns/
 mlflow.db
 
-# Dados
+# Model artifacts (gerados)
+models/registry/
+
+# Dados processados
 data/processed/
 
 # Logs
 *.log
+
+# Temporários
+*.tmp
+*.temp
+
+# VSCode
+.vscode/
 
 # Sistema
 .DS_Store

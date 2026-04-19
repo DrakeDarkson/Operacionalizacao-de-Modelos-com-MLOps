@@ -5,15 +5,11 @@ import time
 import mlflow
 import mlflow.sklearn
 import yaml
-from sklearn.decomposition import PCA
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 from src.data.load_data import load_data
 from src.data.diagnose_data import diagnose_dataset, print_diagnosis
 from src.features.build_features import prepare_dataset
-from src.models.perceptron import build_perceptron_pipeline
-from src.models.decision_tree import build_decision_tree_pipeline
-from src.models.random_forest import build_random_forest_pipeline
+from src.models.factory import build_model, get_model_params
 from src.training.train import split_data, train_and_evaluate
 from src.training.tuning import run_grid_search
 
@@ -21,41 +17,6 @@ from src.training.tuning import run_grid_search
 def load_config(config_path: str = "configs/config.yaml") -> dict:
     with open(config_path, "r", encoding="utf-8") as file:
         return yaml.safe_load(file)
-
-
-def get_reduction_object(config: dict, reduction_name: str):
-    if reduction_name == "none":
-        return None
-
-    if reduction_name == "pca":
-        return PCA(n_components=config["pca"]["n_components"])
-
-    if reduction_name == "lda":
-        return LinearDiscriminantAnalysis()
-
-    raise ValueError(f"Técnica de redução não suportada: {reduction_name}")
-
-
-def build_model(config: dict, model_name: str, reduction=None):
-    if model_name == "perceptron":
-        params = config["perceptron"].copy()
-        return build_perceptron_pipeline(reduction=reduction, **params)
-
-    if model_name == "decision_tree":
-        params = config["decision_tree"].copy()
-        return build_decision_tree_pipeline(reduction=reduction, **params)
-
-    if model_name == "random_forest":
-        params = config["random_forest"].copy()
-        return build_random_forest_pipeline(reduction=reduction, **params)
-
-    raise ValueError(f"Modelo não suportado: {model_name}")
-
-
-def get_model_params(config: dict, model_name: str) -> dict:
-    if model_name not in config:
-        return {}
-    return config[model_name]
 
 
 def log_text_artifact(filename: str, content: str):
@@ -83,8 +44,11 @@ def run_experiment(
     y_train,
     y_test
 ):
-    reduction = get_reduction_object(config, reduction_name)
-    base_model = build_model(config, model_name, reduction=reduction)
+    base_model = build_model(
+        config=config,
+        model_name=model_name,
+        reduction_name=reduction_name
+    )
     model_params = get_model_params(config, model_name)
 
     run_name = f"{model_name}_{reduction_name}"
@@ -201,14 +165,14 @@ def main():
     diagnosis = diagnose_dataset(df)
     print_diagnosis(diagnosis)
 
-    X, y, ids, df_prepared = prepare_dataset(
+    X, y, ids, _ = prepare_dataset(
         df=df,
         id_column=config["data"]["id_column"],
         target_source_column=config["data"]["target_source_column"],
         target_column=config["data"]["target_column"]
     )
 
-    X_train, X_test, y_train, y_test, ids_train, ids_test = split_data(
+    X_train, X_test, y_train, y_test, _, _ = split_data(
         X,
         y,
         ids,

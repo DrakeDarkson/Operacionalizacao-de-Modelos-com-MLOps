@@ -61,3 +61,23 @@ grid_search:
     min_samples_split: [2, 5, 10]
     min_samples_leaf: [1, 2, 4]
     max_features: [sqrt, log2]
+
+deployment:
+  model_name: random_forest       # perceptron | decision_tree | random_forest
+  reduction_method: none          # none | pca | lda
+  package_name: vulnerabilidade_municipal
+  package_dir: models/registry
+  model_version: v1
+
+service:
+  host: 127.0.0.1
+  port: 5000
+
+monitoring:
+  drift_alpha: 0.05
+  performance_drop_threshold: 0.03
+  monitoring_dir: artifacts/monitoring
+
+business_metrics:
+  positive_class: 1
+  priority_metric: recall_vulnerabilidade_alta
