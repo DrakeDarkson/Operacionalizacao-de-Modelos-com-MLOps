@@ -126,7 +126,7 @@ def run_experiment(
 
         mlflow.sklearn.log_model(
             sk_model=trained_model,
-            name="model"
+            artifact_path="model"
         )
 
         print(f"\n=== EXPERIMENTO: {model_name} | REDUÇÃO: {reduction_name} ===")
